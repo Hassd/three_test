@@ -1,0 +1,87 @@
+.circular(@w) {
+    border-radius: 50%;
+    text-align: center;
+    width: unit(@w,px);
+    height:unit(@w,px);
+    line-height: unit(@w,px);
+}
+.square(@w) {
+    width: unit(@w,px);
+    height: unit(@w,px);
+    line-height: unit(@w,px);
+}
+.lh(@w, @s: 16) {
+    height: unit(@w,px);
+    line-height: unit(@w,px);
+    font-size: unit(@s,px);
+}
+.btn(@w, @h, @bc: #fff, @brc: #999, @tc: #999, @br: 4, @fs: 12) {
+    width: unit(@w,px);
+    height: unit(@h,px);
+    line-height: unit(@h,px);
+    background-color: @bc;
+    border: 1px solid @brc;
+    color: @tc;
+    border-radius: unit(@br,px);
+    text-align: center;
+    box-sizing: content-box;
+    font-size: unit(@fs,px);
+}
+.pf(@w: 100%, @h: 100%) {
+    width: unit(@w,px);
+    height: unit(@w,px);
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+}
+.patl(@t,@l){
+    display: block;
+    position: absolute;
+    top: unit(@t,px);
+    left: unit(@l,px);
+}
+.patr(@t,@r){
+    display: block;
+    position: absolute;
+    top: unit(@t,px);
+    right: unit(@r,px);
+}
+.pabl(@b,@l){
+    display: block;
+    position: absolute;
+    bottom: unit(@b,px);
+    left: unit(@l,px);
+}
+.pabr(@b,@r){
+    display: block;
+    position: absolute;
+    bottom: unit(@b,px);
+    right: unit(@r,px);
+}
+.placeholder(@c,@fs:16){
+    input::-webkit-input-placeholder,
+    textarea::-webkit-input-placeholder {
+        color: @c;
+        font-size: unit(@fs,px);
+    }
+
+    input:-moz-placeholder,
+    textarea:-moz-placeholder {
+        color: @c;
+        font-size: unit(@fs,px);
+    }
+
+    input::-moz-placeholder,
+    textarea::-moz-placeholder {
+        color: @c;
+        font-size:unit(@fs,px);
+    }
+
+    input:-ms-input-placeholder,
+    textarea:-ms-input-placeholder {
+        color: @c;
+        font-size: unit(@fs,px);
+    }
+}

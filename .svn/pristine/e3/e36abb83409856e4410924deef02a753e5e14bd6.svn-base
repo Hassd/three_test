@@ -1,0 +1,298 @@
+<template>
+    <div class="container" id="container"></div>
+</template>
+<script>
+import * as THREE from "@/assets/jsm/three.module";
+import { OrbitControls } from "@/assets/jsm/controls/OrbitControls";
+import { TWEEN } from "@/assets/jsm/libs/tween.module.min";
+import ThreeBSP from "@/assets/js/ThreeBSP";
+export default {
+    data() {
+        return {
+            camera: null,
+            scene: null,
+            renderer: null,
+            mesh: null,
+            light: null,
+            controls: null,
+            mesh1: null,
+            mixer1: null,
+            clock: null,
+
+            state: false,
+
+            raycaster: null,
+            mouse: null,
+            process: process.env.BASE_URL
+        };
+    },
+    computed: {},
+    beforeDestroy() {
+        // this.scene.children.forEach((data, index) => {
+        //     if (data.type == "Group") {
+        //         data.traverse(function(obj) {
+        //             if (obj.type === "Mesh") {
+        //                 obj.geometry.dispose();
+        //                 if (obj.material.length) {
+        //                     obj.material.forEach(obj2 => {
+        //                         obj2.dispose();
+        //                     });
+        //                 } else {
+        //                     obj.material.dispose();
+        //                 }
+        //             }
+        //         });
+        //         this.scene.remove(data);
+        //     } else {
+        //         this.scene.remove(data);
+        //     }
+        // });
+        //事件
+        this.initThree = null;
+        this.initCamera = null;
+        this.initScene = null;
+        this.initLight = null;
+        this.initGeometry = null;
+        this.animate = null;
+        this.initControls = null;
+        this.initRaycaster = null;
+        this.initOutline = null;
+        this.addLine = null;
+        this.setSprite = null;
+        this.setLabel = null;
+
+        //变量
+        this.container = null;
+        this.camera = null;
+        this.scene = null;
+        this.renderer = null;
+        this.mesh = null;
+        this.light = null;
+        this.clock = null;
+        this.controls = null;
+        this.mesh1 = null;
+        this.mixer1 = null;
+        this.raycaster = null;
+        this.mouse = null;
+
+        window.removeEventListener("click", this.onclikc);
+        window.removeEventListener("resize", this.onWindowResize);
+    },
+    mounted() {
+        if (document.getElementById("container")) {
+            this.clock = new THREE.Clock();
+            this.initThree();
+            this.initCamera();
+            this.initScene();
+            this.initLight();
+            this.initGeometry();
+            this.initRaycaster();
+            // //辅助线
+            let helper = new THREE.AxesHelper(10);
+            this.scene.add(helper);
+            window.addEventListener("resize", this.onWindowResize, false);
+            window.addEventListener("click", this.onclikc, false);
+            this.initControls();
+            this.animate();
+        }
+    },
+    methods: {
+        initThree() {
+            //渲染器
+            this.container = document.getElementById("container");
+            this.renderer = new THREE.WebGLRenderer({
+                antialias: true,
+                alpha: true
+            }); //alpha设置为true 背景为透明
+            this.renderer.setSize(
+                this.container.clientWidth,
+                this.container.clientHeight
+            );
+            // this.renderer.shadowMap.enabled = true;
+            this.container.appendChild(this.renderer.domElement);
+        },
+        initCamera() {
+            //相机
+            this.camera = new THREE.PerspectiveCamera(
+                75,
+                this.container.clientWidth / this.container.clientHeight,
+                1,
+                10000
+            );
+            this.camera.position.x = 0;
+            this.camera.position.y = 0;
+            this.camera.position.z = 500;
+            this.camera.up.z = 0;
+            this.camera.up.y = 1;
+            this.camera.up.x = 0;
+            this.camera.lookAt(0, 0, 0);
+        },
+        initScene() {
+            //场景
+            this.scene = new THREE.Scene();
+        },
+        initLight() {
+            //光源
+            this.scene.add(new THREE.AmbientLight(0xffffff)); // 创建环境光源，不产生阴影
+            this.light = new THREE.DirectionalLight(0xffffff); // 创建点光源，可以产生阴影
+            this.light.position.set(0, 50, 50);
+            this.light.shadow.camera.top = 10;
+            this.light.shadow.camera.bottom = -10;
+            this.light.shadow.camera.left = -10;
+            this.light.shadow.camera.right = 10;
+            //告诉平行光需要开启阴影投射
+            this.light.castShadow = true;
+            this.scene.add(this.light);
+        },
+        initControls() {
+            //相机旋转插件
+            this.controls = new OrbitControls(
+                this.camera,
+                this.renderer.domElement
+            );
+            //是否使用
+            this.controls.enabled = true;
+            // 使动画循环使用时阻尼或自转 意思是否有惯性
+            this.controls.enableDamping = false;
+            //动态阻尼系数 就是鼠标拖拽旋转灵敏度
+            this.controls.dampingFactor = 1;
+            //是否可以缩放
+            this.controls.enableZoom = true;
+            //是否自动旋转
+            this.controls.autoRotate = false;
+            //设置相机距离原点的最远距离
+            this.controls.minDistance = 1;
+            //设置相机距离原点的最远距离
+            this.controls.maxDistance = 32000;
+            //是否开启右键拖拽
+            this.controls.enablePan = true;
+            //最大仰视角和俯视角
+            this.controls.minPolarAngle = 0; // radians
+            this.controls.maxPolarAngle = (Math.PI * 33) / 64;
+            //是否自动旋转，自动旋转速度。默认每秒30圈
+            this.controls.autoRotate = false;
+            this.controls.autoRotateSpeed = 0.2; // 30 seconds per round when fps is 60
+            //是否能使用键盘
+            this.controls.enableKeys = false;
+
+            // this.controls.target = new THREE.Vector3(0, 0, 0); //修改相机原点
+        },
+        initRaycaster() {
+            //射线，用以判断点击那个模型
+            this.raycaster = new THREE.Raycaster();
+            this.mouse = new THREE.Vector2();
+        },
+        onclikc(event) {
+            this.mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            this.mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+            this.raycaster.setFromCamera(this.mouse, this.camera);
+            var intersects = this.raycaster.intersectObjects(
+                this.scene.children,
+                true
+            );
+            // console.log(intersects[0].point);
+            // console.log(intersects[0].object);
+            // console.log(this.camera);
+            if (intersects.length) {
+            }
+        },
+        onWindowResize() {
+            // 窗口自动适应
+            this.camera.aspect = window.innerWidth / window.innerHeight;
+            this.camera.updateProjectionMatrix();
+            this.renderer.setSize(window.innerWidth, window.innerHeight);
+        },
+        animate() {
+            if (this.renderer) {
+                let delta = this.clock.getDelta();
+                if (this.mixer1) {
+                    this.mixer1.update(delta);
+                }
+                this.controls.update();
+                this.renderer.render(this.scene, this.camera);
+                TWEEN.update();
+                requestAnimationFrame(this.animate);
+            }
+        },
+
+        initGeometry() {
+            let cube1 = this.setBoxGeometry(100, 100, 5, 0, 0, 0, 0x000000);
+            let cube2 = this.setBoxGeometry(20, 20, 5, 0, 0, 0);
+
+            // this.scene.add(cube1);
+            // this.scene.add(cube2);
+            this.addBSP(cube1, cube2, "#000", "subtract");
+        },
+        setBoxGeometry(w, h, d, x, y, z, color = 0x00ff00) {
+            var geometry = new THREE.BoxGeometry(w, h, d);
+            var material = new THREE.MeshBasicMaterial({
+                color: color
+                // wireframe: true //以线条平面渲染
+            });
+            var cube = new THREE.Mesh(geometry, material);
+            cube.position.set(x, y, z);
+            return cube;
+        },
+        addBSP(cube1, cube2, color, type) {
+            let resultBSP;
+            var cubeBSP1 = new ThreeBSP(cube1);
+            var cubeBSP2 = new ThreeBSP(cube2);
+            let handle = {
+                intersect: () => {
+                    //交集
+                    resultBSP = this.intersectBsp(cubeBSP1, cubeBSP2, color);
+                },
+                union: () => {
+                    //并集
+                    resultBSP = this.unionBsp(cubeBSP1, cubeBSP2, color);
+                },
+                subtract: () => {
+                    //缺集
+                    resultBSP = this.subtractBsp(cubeBSP1, cubeBSP2, color);
+                }
+            };
+            handle[type]();
+            //重新赋值一个纹理
+            var material = new THREE.MeshBasicMaterial({
+                color: color
+                // wireframe: true
+            });
+            //从BSP对象内获取到处理完后的mesh模型数据
+            var result = resultBSP.toMesh(material);
+            //更新模型的面和顶点的数据
+            result.geometry.computeFaceNormals();
+            result.geometry.computeVertexNormals();
+            result.material.flatshading = THREE.FlatShading;
+            result.geometry.computeFaceNormals(); //重新计算几何体侧面法向量
+            result.geometry.computeVertexNormals();
+            result.material.needsUpdate = true; //更新纹理
+            result.geometry.buffersNeedUpdate = true;
+            result.geometry.uvsNeedUpdate = true;
+            //将计算出来模型添加到场景当中
+            this.scene.add(result);
+        },
+        intersectBsp(cubeBSP1, cubeBSP2, color) {
+            //处理网格对象(交集)
+            //进行交集计算
+            var resultBSP = cubeBSP1.intersect(cubeBSP2);
+            return resultBSP;
+        },
+        unionBsp(cubeBSP1, cubeBSP2, color) {
+            //进行并集计算
+            var resultBSP = cubeBSP1.union(cubeBSP2);
+            return resultBSP;
+        },
+        subtractBsp(cubeBSP1, cubeBSP2, color) {
+            //进行缺集计算
+            var resultBSP = cubeBSP1.subtract(cubeBSP2);
+            return resultBSP;
+        }
+    }
+};
+</script>
+<style lang="less">
+.container {
+    width: 100%;
+    height: 100%;
+}
+</style>

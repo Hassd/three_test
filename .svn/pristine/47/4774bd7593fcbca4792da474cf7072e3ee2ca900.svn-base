@@ -1,0 +1,24 @@
+<template>
+    <div>
+        <ul>
+            <li>
+                <router-link to="test1">粒子动画1</router-link>
+            </li>
+            <li>
+                <router-link to="test2">模型居中和自动调节大小</router-link>
+            </li>
+        </ul>
+    </div>
+</template>
+<script>
+export default {
+    data() {
+        return {};
+    },
+    mounted() {},
+    methods: {}
+};
+</script>
+<style lang="less">
+@import url("../assets/less/public.less");
+</style>

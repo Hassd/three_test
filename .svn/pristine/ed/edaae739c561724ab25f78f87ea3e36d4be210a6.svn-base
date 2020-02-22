@@ -1,0 +1,24 @@
+<template>
+    <div>
+        <ul>
+            <li>
+                <router-link to="/test1">练习1</router-link>
+            </li>
+        </ul>
+    </div>
+</template>
+<script>
+export default {
+    data() {
+        return {};
+    },
+    computed: {},
+    mounted() {},
+    methods: {}
+};
+</script>
+<style lang="less">
+ul {
+    padding: 20px;
+}
+</style>

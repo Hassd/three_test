@@ -1,0 +1,383 @@
+export default {
+    /*
+        创建报表列表 ----开始
+    */
+
+    listUpdate(data, Parent, td) {
+        data.forEach(item => {
+            let arr = [];
+            td.forEach(item2 => {
+                arr.push({
+                    label: "div",
+                    innerHTML: item[item2]
+                });
+            });
+            let div = this.addDom({
+                label: "div",
+                className: "start list_td",
+                child: arr
+            });
+            Parent.appendChild(div);
+        });
+    },
+    addlist(listData) {
+        let paging = this.addPagingDom(listData);
+        let hrData = [];
+        listData.hr.forEach(item => {
+            hrData.push({
+                label: "div",
+                innerHTML: item
+            });
+        });
+        let listPageDiv = {
+            label: "div",
+            className: "listBox direction flex",
+            child: [
+                {
+                    label: "h3",
+                    className: "list_title between shrink ",
+                    id: "list" + listData.index,
+                    appendChild: [paging],
+                    child: [
+                        {
+                            label: "h3",
+                            innerHTML: listData.title
+                        },
+                        {
+                            label: "div",
+                            className: "start mt10",
+                            child: [
+                                {
+                                    label: "input",
+                                    className: "input",
+                                    type: "date",
+                                    id: "list_start_time" + listData.index,
+                                    placeholder: "格式如：2015-12-12"
+                                },
+                                {
+                                    label: "div",
+                                    className: "input_div ml10 mr10",
+                                    innerHTML: "-"
+                                },
+                                {
+                                    label: "input",
+                                    className: "input",
+                                    type: "date",
+                                    id: "list_end_time" + listData.index,
+                                    placeholder: "格式如：2015-12-12"
+                                },
+                                {
+                                    label: "button",
+                                    className: "button",
+                                    innerHTML: "搜索",
+                                    event: {
+                                        click: () => {
+                                            listData.search();
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    label: "div",
+                    className: "list_tr list_th shrink",
+                    child: hrData
+                },
+                {
+                    label: "div",
+                    className: "list_tr",
+                    id: "list_null" + listData.index,
+                    child: [
+                        {
+                            label: "div",
+                            className: "list_null",
+                            innerHTML: "没有数据"
+                        }
+                    ]
+                },
+                {
+                    label: "div",
+                    className: "list_data",
+                    id: "list_data" + listData.index,
+                    child: []
+                }
+            ]
+        };
+        let div = this.addDom(listPageDiv);
+        div.style.display = "inline-block";
+        return div;
+    },
+    /*
+        创建报表列表 ----结束
+    */
+
+
+
+
+
+
+
+
+
+
+
+    /*创建分页 ----开始*/
+
+    addPagingDom(pagingData) {
+        //创建分页
+
+        // pagingData: {
+        //     num: 1,         //第几页
+        //     total: 10,       //有几页
+        //     index: "listPaging",  //第几个
+        //     change: function(num) {      //分页改变后做什么
+        //         console.log(num);
+        //     }
+        // }
+        let div = this.addPaging(pagingData);
+        let stt = setInterval(() => {
+            if (document.getElementById('paging_list' + pagingData.index)) {
+                this.initPaging(pagingData);
+                clearInterval(stt);
+            }
+        });
+        return div;
+    },
+    initPaging(pagingData) {    //创建不固定分页数字模块
+        let pagingNumBox = document.getElementById('paging_list' + pagingData.index);
+        let pagingTotalBox = document.getElementById('pagingTotal' + pagingData.index);
+        pagingTotalBox.innerHTML = "一共" + pagingData.total + "页";
+
+        if (pagingData.total <= 1) {
+            document.getElementById("paging" + pagingData.index).style.visibility =
+                "hidden";
+        } else {
+            document.getElementById("paging" + pagingData.index).style.visibility =
+                "initial";
+        }
+
+        pagingNumBox.innerHTML = "";
+        let arr = [];
+        if (pagingData.total <= 5) {
+            for (let i = 0; i < pagingData.total; i++) {
+                arr.push(i + 1);
+            }
+        } else {
+            if (pagingData.num <= 3) {
+                for (let i = 0; i < 5; i++) {
+                    arr.push(i + 1);
+                }
+            } else if (
+                pagingData.num > 3 &&
+                pagingData.num <= pagingData.total - 3
+            ) {
+                for (let i = 0; i < 5; i++) {
+                    arr.push(i + pagingData.num - 2);
+                }
+            } else if (
+                pagingData.num > pagingData.total - 3 &&
+                pagingData.num <= pagingData.total
+            ) {
+                for (let i = 0; i < 5; i++) {
+                    arr.push(pagingData.total - 4 + i);
+                }
+            }
+        }
+        let _this = this;
+        arr.forEach(item => {
+            let div = document.createElement("div");
+            div.innerHTML = item;
+            if (pagingData.num == item) {
+                div.className = "paging_select";
+            } else {
+                div.className = "";
+            }
+            div.setAttribute("paging-index", item);
+            div.addEventListener("click", function () {
+                let num = this.getAttribute("paging-index");
+                pagingData.num = parseInt(num);
+                _this.initPaging(pagingData);
+                pagingData.change(pagingData.num);
+            });
+            pagingNumBox.appendChild(div);
+        });
+
+    },
+    addPaging(pagingData) {     //创建分页固定的模块
+        let pagingDiv = [
+            {
+                label: "button",
+                className: "first",
+                innerHTML: "首页",
+                event: {
+                    click: () => {
+                        pagingData.num = 1;
+                        this.initPaging(pagingData);
+                        pagingData.change(pagingData.num);
+                    }
+                }
+            },
+            {
+                label: "button",
+                className: "Previous",
+                innerHTML: "上一页",
+                event: {
+                    click: () => {
+                        if (pagingData.num > 1) {
+                            pagingData.num--;
+                            this.initPaging(pagingData);
+                            pagingData.change(pagingData.num);
+                        }
+                    }
+                }
+            },
+            {
+                label: "div",
+                className: "pagingNumBox start",
+                id: 'paging_list' + pagingData.index
+            },
+            {
+                label: "button",
+                className: "next",
+                innerHTML: "下一页",
+                event: {
+                    click: () => {
+                        if (pagingData.num < pagingData.total) {
+                            pagingData.num++;
+                            this.initPaging(pagingData);
+                            pagingData.change(pagingData.num);
+                        }
+                    }
+                }
+            },
+            {
+                label: "button",
+                className: "last",
+                innerHTML: "末页",
+                event: {
+                    click: () => {
+                        pagingData.num = pagingData.total;
+                        this.initPaging(pagingData);
+                        pagingData.change(pagingData.num);
+                    }
+                }
+            },
+            {
+                label: "div",
+                className: "pagingTotal",
+                id: "pagingTotal" + pagingData.index,
+                innerHTML: "一共" + pagingData.total + "页"
+            }
+        ];
+        let div = this.addDom(pagingDiv);
+        div.className = "list_paging start";
+        div.id = "paging" + pagingData.index;
+        return div;
+    },
+
+
+
+
+    /*创建分页 ----结束*/
+
+
+    addDom(divData) {   //通过json格式生成元素模块
+        let divBox = document.createElement("div");
+        if (Array.isArray(divData)) {
+            divData.forEach(element => {
+                divBox.appendChild(this.loopAddDom(element));
+            });
+        } else {
+            divBox.appendChild(this.loopAddDom(divData));
+        }
+        return divBox;
+    },
+    loopAddDom(item) {  //循环生成元素
+        let div = this.createElement({
+            label: item.label,
+            className: item.className,
+            id: item.id,
+            title: item.title,
+            innerHTML: item.innerHTML,
+            type: item.type,
+            name: item.name,
+            placeholder: item.placeholder,
+            maxlength: item.maxlength
+        });
+        if (item.event) {
+            this.addEvent(div, item.event);
+        }
+
+        if (Array.isArray(item.child)) {
+            item.child.forEach(element => {
+                div.appendChild(this.loopAddDom(element));
+            });
+        }
+        if (Array.isArray(item.appendChild)) {
+            item.appendChild.forEach(element => {
+                div.appendChild(element);
+            });
+        }
+        return div;
+    },
+    createElement(obj) {  //增加元素
+        // let asd = {
+        //     label: "input",
+        //     className: "inputt",
+        //     id: "inputt1",
+        //     title: "我是input",
+        //     innerHTML:"div"
+        //     type: "text",
+        //     name: "zxcxzc",
+        //     placeholder: "placeholder",
+        //     maxlength: "999",
+        // }
+
+        let label = obj.label || "div";
+        let className = obj.className || "";
+        let id = obj.id || "";
+        let title = obj.title || "";
+        let innerHTML = obj.innerHTML || "";
+
+        let type = obj.type || "text";
+        let name = obj.name || "";
+        let placeholder = obj.placeholder || "";
+        let maxlength = obj.maxlength || "";
+
+        let element = document.createElement(label);
+        className ? (element.className = className) : null;
+        id ? (element.id = id) : null;
+        title ? (element.title = title) : null;
+
+        if (label === "input") {
+            element.type = type;
+            name ? (element.name = name) : null;
+            placeholder ? (element.placeholder = placeholder) : null;
+            maxlength ? (element.maxLength = maxlength) : null;
+        } else {
+            innerHTML ? (element.innerHTML = innerHTML) : null;
+        }
+
+        return element;
+    },
+    addEvent(element = document, object) {
+        //添加事件
+        // addEvent(div, { click: fun });
+        for (const key in object) {
+            if (object.hasOwnProperty(key)) {
+                element.addEventListener(key, object[key], false);
+            }
+        }
+    },
+    delEvent(element = document, object) {
+        //删除事件
+        // delEvent(div, { click: fun });
+        for (const key in object) {
+            if (object.hasOwnProperty(key)) {
+                element.removeEventListener(key, object[key]);
+            }
+        }
+    }
+};

@@ -1,0 +1,173 @@
+.flex{
+    display: -ms-flex;
+    display: flex;
+}
+.start{
+    display: flex;
+    display: -ms-flex;
+    justify-content: flex-start;
+}
+.end{
+    display: flex;
+    display: -ms-flex;
+    justify-content:flex-end;
+}
+.center{
+    display: flex;
+    display: -ms-flex;
+    justify-content:center;
+}
+.around{
+    display: flex;
+    display: -ms-flex;
+    justify-content: space-around;
+}
+.between{
+    display: flex;
+    display: -ms-flex;
+    justify-content:space-between;
+}
+.wrap{
+    flex-wrap: wrap;
+}
+.direction{
+    flex-direction: column;
+}
+.aiend{
+    align-items:flex-end;
+}
+.flex1{
+    flex: 1;
+    -ms-flex: 1;
+}
+.shrink{
+    flex-shrink: 0; //按比例压缩  默认1
+}
+.hidden{
+    overflow: hidden;
+}
+.pointer{
+    cursor: pointer;
+}
+.ls{    /*文字间隔*/
+    letter-spacing:1px;
+}
+.scroll{    /* 滚动条样式   火狐不支持 */
+    overflow: auto;
+    overflow-y: none;
+    scrollbar-color: none;
+    scrollbar-track-color: none;
+    -ms-scrollbar-track-color: none;
+}
+.scroll::-webkit-scrollbar  
+{  
+    width: 5px;  
+    height: 8px;  
+    margin-right: 20px;
+}  
+/*定义滚动条轨道 内阴影+圆角*/  
+.scroll::-webkit-scrollbar-track  
+{  
+    -webkit-box-shadow: inset 0 0 6px rgb(255, 255, 255);  
+    border-radius: 10px;  
+}    
+/*定义滑块 内阴影+圆角*/  
+.scroll::-webkit-scrollbar-thumb  
+{  
+    border-radius: 10px;  
+    -webkit-box-shadow: inset 0 0 6px rgb(255, 255, 255);  
+    background-color: rgb(236, 236, 236);  
+}  
+/*滑块效果*/
+.scroll::-webkit-scrollbar-thumb:hover
+{
+    border-radius: 5px;
+    -webkit-box-shadow: inset 0 0 5px rgb(255, 255, 255);
+    background: rgb(236, 236, 236);
+}
+
+
+
+
+.fixedCM{       /*固定定位居中*/
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+}
+.relative{      /*设置定位父级*/
+    position: relative;
+}
+.absoluteCM{    /*box居中*/
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+}
+.absoluteLC{    /*box水平居中*/
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translate(-50%,0);
+}
+.absoluteTC{    /*box垂直居中*/
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: translate(0,-50%);
+}
+.middle{        /*文字垂直居中*/
+    vertical-align: middle;
+    display: table-cell;
+}
+.text-right{    /*文字右对齐*/
+    text-align: right;
+}
+.text-center{   /*文字居中*/
+    text-align: center;
+}
+.text-left{     /*文字左对齐*/
+    text-align: left;
+}
+.text-break{   /*文字强制换行*/
+    word-break: break-all;
+}
+.font-bold{     /*粗体*/
+    font-weight: 700;
+}
+.font-normal{   /*正常*/
+    font-weight: 400;
+}
+.font-small{    /*细体*/
+    font-weight: 100;
+}
+.mask{      /*遮罩层样式*/
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #000;
+    opacity: 0;
+    z-index: 100;
+}
+.nowrap{    /*单行溢出省略号*/
+    overflow: hidden;
+    text-overflow:ellipsis;
+    white-space: nowrap;
+}
+.left{      /*左浮动*/
+    float: left;
+}
+.right{     /*右浮动*/
+   float: right; 
+}
+.both{      /*清除浮动*/
+   &::after{
+       content: '';
+       clear: both;
+       height: 0;
+       display: block;
+   }
+}
+
