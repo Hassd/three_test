@@ -1,6 +1,0 @@
-@import './reset.less';         //初始化样式
-@import '../overall.less';       //全局样式
-@import './fixed.less';       //全局固定样式
-@import './margin.less';        //margin样式
-@import './padding.less';        //padding样式 
-@import '../form.less';        //padding样式 
